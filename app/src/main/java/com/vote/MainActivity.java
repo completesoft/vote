@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     final String LOG_TAG = "myLogs";
     final String ID = "1";
     int HIVE_INTERVAL = 60; //
-    int COUNT_DOWN = 59;
+    int COUNT_DOWN = 10;
 
 
 
@@ -93,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
 //Save to file complaint and toggle layout
     public void onClickSend(View view) {
 
+        hideKeyboard();
+
+
         EditText etName = (EditText) findViewById(R.id.editText6);
         EditText etPhone = (EditText) findViewById(R.id.editText7);
         EditText etMessage = (EditText) findViewById(R.id.editText8);
@@ -106,16 +109,27 @@ public class MainActivity extends AppCompatActivity {
         writeFile(s);
 
 
-        View view2 = this.getCurrentFocus();
-        if (view2 != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view2.getWindowToken(), 0);
-        }
+
 
         sendMesSetLayout();
     }
 
+
+    public void hideKeyboard(){
+
+        Log.d(LOG_TAG, "hideKeyboard()");
+
+        View c_view = this.getCurrentFocus();
+        if (c_view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(c_view.getWindowToken(), 0);
+        }
+    }
+
+
     public void sendMesSetLayout(){
+
+
         setContentView(R.layout.thanx);
 
         String str = "";
@@ -211,6 +225,8 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void onFinish() {
+
+                hideKeyboard();
                 setContentView(R.layout.vote_page);
             }
         }.start();
