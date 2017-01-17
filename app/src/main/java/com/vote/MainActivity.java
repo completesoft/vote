@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     final String LOG_TAG = "myLogs";
     final String ID = "1";
     int HIVE_INTERVAL = 60; //
-    int COUNT_DOWN = 15;
+    int COUNT_DOWN = 60;
 
 
 
