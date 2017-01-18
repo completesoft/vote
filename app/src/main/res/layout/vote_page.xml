@@ -96,4 +96,43 @@
         android:layout_alignParentEnd="true"
         android:onClick="onClickShowForm" />
 
+    <Button
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:id="@+id/btnLeft"
+        android:onClick="onClickFinish"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/transparent"/>
+
+    <Button
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:id="@+id/btnCancel"
+        android:onClick="onClickFinish"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@android:color/transparent"
+        android:layout_toEndOf="@+id/btnLeft"
+        android:layout_marginStart="42dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp" />
+
+    <Button
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:id="@+id/btnRight"
+        android:layout_marginStart="58dp"
+        android:layout_toEndOf="@+id/btnCancel"
+        android:onClick="onClickFinish"
+        android:clickable="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
+        android:background="@android:color/transparent"
+        android:focusable="true" />
+
 </RelativeLayout>
