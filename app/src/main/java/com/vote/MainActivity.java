@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     final String ID = "1";
     int HIVE_INTERVAL = 60; //
     int COUNT_DOWN = 15;
+    final String FINISH_CODE = "llrrllr";
+    String CompareFinishCode = "";
+
 
 
 
@@ -257,4 +261,19 @@ public class MainActivity extends AppCompatActivity {
         return res;
     }
 
+    public void onClickFinish(View view) {
+
+        switch (view.getId()){
+            case R.id.btnLeft:
+                CompareFinishCode+='l';
+                break;
+            case R.id.btnCancel:
+                CompareFinishCode="";
+                break;
+            case R.id.btnRight:
+                CompareFinishCode+='r';
+                break;
+        }
+        if(FINISH_CODE.equals(CompareFinishCode)) this.finish();
+    }
 }
