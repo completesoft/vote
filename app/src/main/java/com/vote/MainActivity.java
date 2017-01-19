@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     final String LOG_TAG = "myLogs";
     final String ID = "1";
     int HIVE_INTERVAL = 60; //
-    int COUNT_DOWN = 60;
+    int COUNT_DOWN = 90;
     final String FINISH_CODE = "llrrllr";
     String CompareFinishCode = "";
 
@@ -206,12 +206,20 @@ public class MainActivity extends AppCompatActivity {
         String s= "Mark"+"#"+mark+'\n';
         writeFile(s);
 
-        sendMesSetLayout();
+        if (mark.equals("1")) {
+            Log.d(LOG_TAG, "showForm()");
+            showForm();
+        }
+        else {
+            sendMesSetLayout();
+        }
+
+
     }
 
-    public void onClickShowForm(View view) {
+
+    public void showForm(){
         setContentView(R.layout.activity_main);
-        //int cnd=59;
 
         final TextView tvCountDown= (TextView) findViewById(R.id.tvCountDown);
         new CountDownTimer(COUNT_DOWN*1000, 1000) {
@@ -220,10 +228,16 @@ public class MainActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
 
                 if (millisUntilFinished <10000) {
-                    tvCountDown.setText("00:0"+millisUntilFinished / 1000);
+                    tvCountDown.setText("00:0"+((millisUntilFinished / 1000) + 1 ));
                 }
-                            else {
-                    tvCountDown.setText("00:"+millisUntilFinished / 1000);
+                else if(millisUntilFinished >69000){
+                    tvCountDown.setText("01:"+((millisUntilFinished / 1000) - 59));
+                }
+                else if(millisUntilFinished >59000) {
+                    tvCountDown.setText("01:0"+((millisUntilFinished / 1000) - 59));
+                }
+                else {
+                    tvCountDown.setText("00:"+((millisUntilFinished / 1000) + 1));
                 }
 
             }
@@ -234,7 +248,10 @@ public class MainActivity extends AppCompatActivity {
                 setContentView(R.layout.vote_page);
             }
         }.start();
+    }
 
+    public void onClickShowForm(View view) {
+        showForm();
     }
 
     //Send ID and timeStamp
