@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                     String[] params = str.split("#");
                     try {
                         res = prmja_com.Post("http://vote.product.in.ua/r.php", params);
-                        Log.d(LOG_TAG, "Три раза");
+                        Log.d(LOG_TAG, "RES = "+res);
                         if(!res.equals("ok")) break;
                         } catch (ExecutionException e) {
                             e.printStackTrace();
