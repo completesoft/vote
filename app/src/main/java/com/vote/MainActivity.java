@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     final String LOG_TAG = "myLogs";
     final String ID = "1";
     int HIVE_INTERVAL = 60; //
-    int COUNT_DOWN = 15;
+    int COUNT_DOWN = 60;
     final String FINISH_CODE = "llrrllr";
     String CompareFinishCode = "";
 
@@ -274,6 +274,8 @@ public class MainActivity extends AppCompatActivity {
                 CompareFinishCode+='r';
                 break;
         }
+        Log.d(LOG_TAG, CompareFinishCode);
         if(FINISH_CODE.equals(CompareFinishCode)) this.finish();
+
     }
 }
