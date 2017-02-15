@@ -1,6 +1,7 @@
 package com.vote;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -295,4 +296,31 @@ public class MainActivity extends AppCompatActivity {
         if(FINISH_CODE.equals(CompareFinishCode)) this.finish();
 
     }
+
+//refactor Back soft-button
+    @Override
+    public void onBackPressed() {
+        // soft button Back - do nothing
+    }
+
+//Close all system dialogs
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(!hasFocus) {
+            Intent closeDialog =
+                    new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(closeDialog);
+        }
+    }
+
+//app became a block-screen
+    @Override
+    public void onAttachedToWindow() {
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+    }
+
 }
