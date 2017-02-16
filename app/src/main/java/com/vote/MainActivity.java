@@ -53,6 +53,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.vote_page);
         setFullScreen();
 
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
+
         // Создаем таймер
         Timer myTimer = new Timer();
         final Handler uiHandler = new Handler();
@@ -293,8 +301,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         Log.d(LOG_TAG, CompareFinishCode);
-        if(FINISH_CODE.equals(CompareFinishCode)) this.finish();
-
+        //if(FINISH_CODE.equals(CompareFinishCode)) this.finish();
+        if(FINISH_CODE.equals(CompareFinishCode)) startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
     }
 
 //refactor Back soft-button
