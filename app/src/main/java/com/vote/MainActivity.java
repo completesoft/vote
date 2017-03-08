@@ -4,38 +4,38 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.prmja.http.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Pattern;
+
+
+class UserMessage {
+    String name;
+    String tel;
+    String message;
+}
+
+
+class Vote {
+    int value;
+}
+
 
 public class MainActivity extends AppCompatActivity {
 
-    final String FILENAME = "file";
     final String LOG_TAG = "myLogs";
     final String ID = "1";
     int HIVE_INTERVAL = 60; //
@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
     final String FINISH_CODE = "llrrllr";
     String CompareFinishCode = "";
 
-
-
+    ArrayList<Vote> votes = new ArrayList<Vote>();
+    ArrayList<UserMessage> messages = new ArrayList<UserMessage>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,30 +84,11 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
-    //Write File (MODE_APPEND)
-    void writeFile(String line) {
-        try {
-            // отрываем поток для записи
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                    openFileOutput(FILENAME, MODE_APPEND)));
-            // пишем данные
-            bw.write(line);
-            // закрываем поток
-            bw.close();
-            Log.d(LOG_TAG, "Файл записан_1");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 
 //Save to file complaint and toggle layout
     public void onClickSend(View view) {
 
         hideKeyboard();
-
 
         EditText etName = (EditText) findViewById(R.id.editText6);
         EditText etPhone = (EditText) findViewById(R.id.editText7);
@@ -118,11 +99,11 @@ public class MainActivity extends AppCompatActivity {
         if(etPhone.getText().length()==0) etPhone.setText("none");
         if(etMessage.getText().length()==0) etMessage.setText("message");
 
-        String s = "Name"+"#"+etName.getText().toString()+"#"+"Phone"+"#"+etPhone.getText().toString()+"#"+"Message"+"#"+etMessage.getText().toString()+'\n';
-        writeFile(s);
-
-
-
+        UserMessage tempMessage = new UserMessage();
+        tempMessage.name = etName.getText().toString();
+        tempMessage.tel = etPhone.getText().toString();
+        tempMessage.message = etMessage.getText().toString();
+        messages.add(tempMessage);
 
         sendMesSetLayout();
     }
@@ -140,44 +121,60 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+    public boolean sendToServer(String[] parameters) {
+
+        String res = "";
+
+        try {
+            res = prmja_com.Post("http://vote.product.in.ua/r.php", parameters);
+            Log.d(LOG_TAG, "RES = "+res);
+            if(!res.equals("ok")) return false;
+        } catch (ExecutionException e) {
+            return false;
+        } catch (InterruptedException e) {
+            return false;
+        }
+
+        return true;
+    }
+
     public void sendMesSetLayout(){
 
 
         setContentView(R.layout.thanx);
 
-        String str = "";
-        String res = "";
-
-            try {
-                // открываем поток для чтения
-                BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(FILENAME)));
-
-                // читаем содержимое
-                while ((str = br.readLine() ) != null) {
-                    //Log.d(LOG_TAG, str);
-                    String[] params = str.split("#");
-                    try {
-                        res = prmja_com.Post("http://vote.product.in.ua/r.php", params);
-                        Log.d(LOG_TAG, "RES = "+res);
-                        if(!res.equals("ok")) break;
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                }
-                //Deleting if file send
-                Log.d(LOG_TAG, "перед удалением "+res);
-                if(res.equals("ok")) {
-                    Log.d(LOG_TAG, "file delete");
-                    File file = new File(getFilesDir(),FILENAME);
-                    file.delete();
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+        for (Vote vote: votes) {
+            Log.d(LOG_TAG, "VOTE "+vote.value);
+            String[] tempParams = new String[2];
+            tempParams[0] = "Mark";
+            tempParams[1] = String.valueOf(vote.value);
+            if (sendToServer(tempParams)) {
+                votes.remove(vote);
             }
+            else {
+                Log.d(LOG_TAG, "Fail send vote to server");
+            }
+        }
+
+        for (UserMessage message: messages) {
+            Log.d(LOG_TAG, "Message: "+message.name);
+            String[] tempParams = new String[6];
+            tempParams[0] = "Message";
+            tempParams[1] = message.message;
+            tempParams[2] = "Name";
+            tempParams[3] = message.name;
+            tempParams[4] = "Phone";
+            tempParams[5] = message.tel;
+
+            if (sendToServer(tempParams)) {
+                messages.remove(message);
+            }
+            else {
+                Log.d(LOG_TAG, "Fail send message to server");
+            }
+        }
+        
 
         new CountDownTimer(5000, 1000) {
             @Override
@@ -193,29 +190,31 @@ public class MainActivity extends AppCompatActivity {
 //Save to file mark from "Vote"
     public void onClick_v1(View view) {
 
-    String mark="0";
+
+        Vote tempVote = new Vote();
+        tempVote.value = 0;
 
         switch(view.getId()){
             case R.id.button:
-                mark="1";
+                tempVote.value = 1;
                 break;
             case R.id.button8:
-                mark="2";
+                tempVote.value = 2;
                 break;
             case R.id.button9:
-                mark="3";
+                tempVote.value = 3;
                 break;
             case R.id.button10:
-                mark="4";
+                tempVote.value = 4;
                 break;
             case R.id.button11:
-                mark="5";
+                tempVote.value = 5;
                 break;
         }
-        String s= "Mark"+"#"+mark+'\n';
-        writeFile(s);
 
-        if (mark.equals("1")) {
+        votes.add(tempVote);
+
+        if (tempVote.value == 1) {
             Log.d(LOG_TAG, "showForm()");
             showForm();
         }
@@ -236,18 +235,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTick(long millisUntilFinished) {
 
-                if (millisUntilFinished <10000) {
-                    tvCountDown.setText("00:0"+((millisUntilFinished / 1000) + 1 ));
-                }
-                else if(millisUntilFinished >69000){
-                    tvCountDown.setText("01:"+((millisUntilFinished / 1000) - 59));
-                }
-                else if(millisUntilFinished >59000) {
-                    tvCountDown.setText("01:0"+((millisUntilFinished / 1000) - 59));
-                }
-                else {
-                    tvCountDown.setText("00:"+((millisUntilFinished / 1000) + 1));
-                }
+                String time = String.format("%02d:%02d", millisUntilFinished / 60000, (millisUntilFinished % 60000) / 1000);
+                tvCountDown.setText(time);
 
             }
             @Override
