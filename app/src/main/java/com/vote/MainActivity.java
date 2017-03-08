@@ -17,6 +17,7 @@ import com.prmja.http.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
@@ -144,21 +145,24 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.thanx);
 
-        for (Vote vote: votes) {
-            Log.d(LOG_TAG, "VOTE "+vote.value);
+        Iterator<Vote> itVote = votes.iterator();
+        Iterator<UserMessage> itMessage = messages.iterator();
+
+        while (itVote.hasNext()) {
+            Vote vote = itVote.next();
             String[] tempParams = new String[2];
             tempParams[0] = "Mark";
             tempParams[1] = String.valueOf(vote.value);
             if (sendToServer(tempParams)) {
-                votes.remove(vote);
+                itVote.remove();
             }
             else {
                 Log.d(LOG_TAG, "Fail send vote to server");
             }
         }
 
-        for (UserMessage message: messages) {
-            Log.d(LOG_TAG, "Message: "+message.name);
+        while (itMessage.hasNext()) {
+            UserMessage message = itMessage.next();
             String[] tempParams = new String[6];
             tempParams[0] = "Message";
             tempParams[1] = message.message;
@@ -168,13 +172,13 @@ public class MainActivity extends AppCompatActivity {
             tempParams[5] = message.tel;
 
             if (sendToServer(tempParams)) {
-                messages.remove(message);
+                itMessage.remove();
             }
             else {
                 Log.d(LOG_TAG, "Fail send message to server");
             }
         }
-        
+
 
         new CountDownTimer(5000, 1000) {
             @Override
